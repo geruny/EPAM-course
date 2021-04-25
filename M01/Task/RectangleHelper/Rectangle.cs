@@ -20,9 +20,14 @@ namespace RectangleHelper
             _y = y;
         }
 
-        public int FindPerimeter() => 2 * (_x + _y);
+        public int FindPerimeter()
+        {
+           return 2 * (_x + _y);
+        } 
 
-        public int FindSquare() => _x * _y;
-
+        public int FindSquare()
+        {
+            return _x * _y;
+        }
     }
 }
