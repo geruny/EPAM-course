@@ -33,10 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MultyAssembly, Version=0.0.0.0, Culture=neutral, PublicKeyToken=8d6b54968f9ff0e6, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\..\Windows\Microsoft.NET\assembly\GAC_MSIL\MultyAssembly\v4.0_0.0.0.0__8d6b54968f9ff0e6\MultyAssembly.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -52,6 +48,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ArrayHelper\ArrayHelper.csproj">
+      <Project>{d21a8a25-4dc5-492c-b7c1-36dde602bef0}</Project>
+      <Name>ArrayHelper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RectangleHelper\RectangleHelper.csproj">
+      <Project>{2c07ae91-3e92-47f8-86f0-59a46c354c09}</Project>
+      <Name>RectangleHelper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

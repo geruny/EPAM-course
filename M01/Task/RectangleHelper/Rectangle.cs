@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RectangleHelper
 {
@@ -14,7 +10,7 @@ namespace RectangleHelper
         public Rectangle(int x, int y)
         {
             if (x < 0 | y < 0)
-                throw new Exception("Arguments must be positive!");
+                throw new ArgumentException("Arguments must be positive!");
 
             _x = x;
             _y = y;
@@ -22,8 +18,8 @@ namespace RectangleHelper
 
         public int FindPerimeter()
         {
-           return 2 * (_x + _y);
-        } 
+            return 2 * (_x + _y);
+        }
 
         public int FindSquare()
         {
