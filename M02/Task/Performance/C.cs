@@ -2,9 +2,11 @@
 
 namespace Performance
 {
-    class C : IComparable<C>
+    class C : IComparable<C>, IMemoryChecker
     {
         public int I;
+
+        int IMemoryChecker.I { get => I; set => I = value; }
 
         public int CompareTo(C c)
         {

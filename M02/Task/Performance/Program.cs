@@ -5,81 +5,41 @@ namespace Performance
 {
     class Program
     {
-        struct S : IComparable<S>
+        struct S : IComparable<S>, IMemoryChecker
         {
-            public int I;
-
+            public int I { get; set; }
             public int CompareTo(S s) => this.I.CompareTo(s.I);
         }
+
+        delegate void ArraySort<T>(T[] array);
 
         static void Main(string[] args)
         {
             var process = Process.GetCurrentProcess();
-            var rnd = new Random();
 
             PrintL("Start time: " + process.StartTime);
             PrintL("Process Name: " + process.ProcessName);
             PrintL();
 
-            //check classes memory
+            //classes tests
 
+            PrintL("--Classes tests--");
             var classes = new C[100000];
-            var memoryBefore = process.PagedMemorySize64;
-            PrintL("Memory before classes array initialization: " + memoryBefore);
-
-            for (int i = 0; i < 100000; i++)
-                classes[i] = new C() { I = rnd.Next() };
-
-            process.Refresh();
-            var memoryAfter = process.PagedMemorySize64;
-            PrintL("Memory after classes array initialization: " + memoryAfter);
-            var deltaClasses = memoryAfter - memoryBefore;
-            PrintL("Delta: " + deltaClasses);
+            var classesDelta = MemoryChecker(classes);
             PrintL();
 
-            //check structs memory
+            //structs tests
 
+            PrintL("--Structs tests--");
             var structs = new S[100000];
-            memoryBefore = process.PagedMemorySize64;
-            PrintL("Memory before structs array initialization: " + memoryBefore);
+            var structsDelta = MemoryChecker(structs);
+            PrintL();
 
-            for (int i = 0; i < 100000; i++)
-                structs[i] = new S() { I = rnd.Next() };
-
-            process.Refresh();
-            memoryAfter = process.PagedMemorySize64;
-            var deltaStructs = memoryAfter - memoryBefore;
-            PrintL("Memory after structs array initialization: " + memoryAfter);
-            PrintL("Delta: " + deltaStructs);
-
-            PrintL($"\nСlasses use more memory than structs by : {deltaClasses - deltaStructs}");
-
-            // MemoryChecker(classes);
-            // MemoryChecker(structs);
-
-            //check classes sorting time
-
-            Stopwatch stopwatch = new Stopwatch();
-
-            stopwatch.Start();
-            Array.Sort(classes);
-            stopwatch.Stop();
-
-            PrintL(stopwatch.ElapsedMilliseconds.ToString());
-        }
-
-        public void TimeChecker<T>(Func<T[], T[]> func, T[] array)
-        {
-            Stopwatch stopwatch = new Stopwatch();
-
-            stopwatch.Start();
-            func(array);
-            stopwatch.Stop();
-
+            PrintL($"ClassesDelta - structsDelta: {classesDelta - structsDelta}");
             PrintL();
         }
 
-        static void MemoryChecker<T>(T[] array) where T : new()
+        static long MemoryChecker<T>(T[] array) where T : IMemoryChecker, new()
         {
             var process = Process.GetCurrentProcess();
             var rnd = new Random();
@@ -88,15 +48,29 @@ namespace Performance
             PrintL("Memory before array initialization: " + memoryBefore);
 
             for (int i = 0; i < 100000; i++)
-                // array[i] = new T() { I = rnd.Next() };
+                array[i] = new T() { I = rnd.Next() };
 
-                process.Refresh();
+            process.Refresh();
             var memoryAfter = process.PagedMemorySize64;
             PrintL("Memory after array initialization: " + memoryAfter);
             PrintL($"Delta: {memoryAfter - memoryBefore}");
+
+            TimeChecker<T>(Array.Sort, array);
+
+            return memoryAfter;
+        }
+
+        static void TimeChecker<T>(ArraySort<T> arraySort, T[] array)
+        {
+            var stopwatch = new Stopwatch();
+
+            stopwatch.Start();
+            arraySort(array);
+            stopwatch.Stop();
+
+            PrintL("Run time sorting: " + stopwatch.ElapsedMilliseconds);
         }
 
         static void PrintL(string str = "") => Console.WriteLine(str);
-        static void Print(string str = "") => Console.Write(str);
     }
 }
