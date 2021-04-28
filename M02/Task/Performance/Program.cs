@@ -52,12 +52,13 @@ namespace Performance
 
             process.Refresh();
             var memoryAfter = process.PagedMemorySize64;
+            var delta = memoryAfter - memoryBefore;
             PrintL("Memory after array initialization: " + memoryAfter);
-            PrintL($"Delta: {memoryAfter - memoryBefore}");
+            PrintL("Delta: " + delta);
 
             TimeChecker<T>(Array.Sort, array);
 
-            return memoryAfter;
+            return delta;
         }
 
         static void TimeChecker<T>(ArraySort<T> arraySort, T[] array)
