@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Students
 {
@@ -23,11 +24,8 @@ namespace Students
             var rnd = new Random();
 
             foreach (var student in listStudents)
-                studentSubjectDict[student] = new HashSet<string> {
-                    subjects[rnd.Next(0, subjects.Length - 1)],
-                    subjects[rnd.Next(0, subjects.Length - 1)],
-                    subjects[rnd.Next(0, subjects.Length - 1)]
-                };
+                studentSubjectDict[student] = new HashSet<string>
+                    (subjects.OrderBy(i => rnd.Next()).Take(3).ToArray());
 
             foreach (KeyValuePair<Student, HashSet<string>> keyValue in studentSubjectDict)
             {
