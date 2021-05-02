@@ -11,7 +11,7 @@ namespace Students
         public Student(string email)
         {
             _email = email ?? throw new ArgumentException();
-            _fullName = getFullName(email);
+            _fullName = GetFullName(email);
         }
 
         public Student(string name, string surname)
@@ -27,15 +27,20 @@ namespace Students
 
         public override bool Equals(object obj)
         {
-            if (obj.GetType() != this.GetType())
-                return false;
+            if (obj != null)
+            {
+                if (obj.GetType() != this.GetType())
+                    return false;
 
-            return this.ToString().Equals(obj.ToString());
+                return this.ToString().Equals(obj.ToString());
+            }
+            else
+                return false;
         }
 
         public override int GetHashCode() => this.ToString().GetHashCode();
 
-        private string getFullName(string email)
+        private static string GetFullName(string email)
         {
             string[] words = email.Substring(0, email.IndexOf('@')).Split('.');
             StringBuilder sb = new StringBuilder();
