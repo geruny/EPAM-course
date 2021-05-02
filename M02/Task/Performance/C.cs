@@ -2,7 +2,7 @@
 
 namespace Performance
 {
-    class C : IComparable<C>, IMemoryChecker
+    internal class C : IComparable<C>, IMemoryChecker
     {
         public int I;
 

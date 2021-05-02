@@ -1,6 +1,6 @@
 ﻿namespace Performance
 {
-    interface IMemoryChecker
+    internal interface IMemoryChecker
     {
         int I { get; set; }
     }

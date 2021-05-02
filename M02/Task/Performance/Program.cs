@@ -3,22 +3,17 @@ using System.Diagnostics;
 
 namespace Performance
 {
-    class Program
+    internal class Program
     {
-        struct S : IComparable<S>, IMemoryChecker
+        private delegate void ArraySort<T>(T[] array);
+
+        private static void Main(string[] args)
         {
-            public int I { get; set; }
-            public int CompareTo(S s) => this.I.CompareTo(s.I);
-        }
-
-        delegate void ArraySort<T>(T[] array);
-
-        static void Main(string[] args)
-        {
-            var process = Process.GetCurrentProcess();
-
-            PrintL("Start time: " + process.StartTime);
-            PrintL("Process Name: " + process.ProcessName);
+            using (var process = Process.GetCurrentProcess())
+            {
+                PrintL("Start time: " + process.StartTime);
+                PrintL("Process Name: " + process.ProcessName);
+            }
             PrintL();
 
             //classes tests
@@ -26,6 +21,7 @@ namespace Performance
             PrintL("--Classes tests--");
             var classes = new C[100000];
             var classesDelta = MemoryChecker(classes);
+            TimeChecker<C>(Array.Sort, classes);
             PrintL();
 
             //structs tests
@@ -33,17 +29,18 @@ namespace Performance
             PrintL("--Structs tests--");
             var structs = new S[100000];
             var structsDelta = MemoryChecker(structs);
+            TimeChecker<S>(Array.Sort, structs);
             PrintL();
 
             PrintL($"ClassesDelta - structsDelta: {classesDelta - structsDelta}");
             PrintL();
         }
 
-        static long MemoryChecker<T>(T[] array) where T : IMemoryChecker, new()
+        private static long MemoryChecker<T>(T[] array) where T : IMemoryChecker, new()
         {
-            var process = Process.GetCurrentProcess();
             var rnd = new Random();
-
+            using var process = Process.GetCurrentProcess();
+                
             var memoryBefore = process.PagedMemorySize64;
             PrintL("Memory before array initialization: " + memoryBefore);
 
@@ -56,12 +53,10 @@ namespace Performance
             PrintL("Memory after array initialization: " + memoryAfter);
             PrintL("Delta: " + delta);
 
-            TimeChecker<T>(Array.Sort, array);
-
             return delta;
         }
 
-        static void TimeChecker<T>(ArraySort<T> arraySort, T[] array)
+        private static void TimeChecker<T>(ArraySort<T> arraySort, T[] array)
         {
             var stopwatch = new Stopwatch();
 
@@ -72,6 +67,6 @@ namespace Performance
             PrintL("Run time sorting: " + stopwatch.ElapsedMilliseconds);
         }
 
-        static void PrintL(string str = "") => Console.WriteLine(str);
+        private static void PrintL(string str = "") => Console.WriteLine(str);
     }
 }
