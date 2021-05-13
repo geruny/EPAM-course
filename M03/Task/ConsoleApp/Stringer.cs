@@ -22,62 +22,60 @@ namespace ConsoleApp
 
         public static string DoubleDefChars(string str, string defChars)
         {
-            if (str == "" | defChars == "")
+            if (string.IsNullOrWhiteSpace(str) | string.IsNullOrWhiteSpace(defChars))
                 throw new ArgumentException("Some argument is empty");
 
-            var chars = new HashSet<char>(defChars.Replace(" ", "").ToCharArray());
-            var sb = new StringBuilder(str);
+            var chars = new HashSet<char>(defChars);
+            var sb = new StringBuilder();
 
-            for (var i = 0; i < sb.Length; i++)
-                foreach (var ch in chars)
-                    if (sb[i].Equals(ch))
-                    {
-                        sb.Insert(i, ch);
-                        ++i;
-                    }
+            foreach (var ch in str)
+            {
+                sb.Append(ch);
+                if (chars.Contains(ch) & !char.IsWhiteSpace(ch))
+                    sb.Append(ch);
+            }
 
             return sb.ToString();
         }
 
         public static string GetSumOfNums(string str1, string str2)
         {
-            if (str1 == "" | str2 == "")
+            if (string.IsNullOrWhiteSpace(str1) | string.IsNullOrWhiteSpace(str2))
                 throw new ArgumentException("Some argument is empty");
 
             if (str1.Length > str2.Length)
-            {
-                var temp = str1;
-                str1 = str2;
-                str2 = temp;
-            }
+                (str1, str2) = (str2, str1);
 
-            int n1 = str1.Length, n2 = str2.Length;
-            int diff = n2 - n1;
+            int str1Length = str1.Length, str2Length = str2.Length;
+            int diff = str2Length - str1Length;
             int carry = 0;
-            var str = "";
+            var str = new StringBuilder();
 
-            for (int i = n1 - 1; i >= 0; i--)
+            for (int i = str1Length - 1; i >= 0; i--)
             {
-                int sum = ((int)(str1[i] - '0') + (int)(str2[i + diff] - '0') + carry);
-                str += (char)(sum % 10 + '0');
+                int sum = ToInt(str1[i]) + ToInt(str2[i + diff]) + carry;
+                str.Append(ToChar(sum));
                 carry = sum / 10;
             }
 
-            for (int i = n2 - n1 - 1; i >= 0; i--)
+            for (int i = str2Length - str1Length - 1; i >= 0; i--)
             {
-                int sum = ((int)(str2[i] - '0') + carry);
-                str += (char)(sum % 10 + '0');
+                int sum = ToInt(str2[i]) + carry;
+                str.Append(ToChar(sum));
                 carry = sum / 10;
             }
 
             if (carry > 0)
-                str += (char)(carry + '0');
+                str.Append(ToChar(carry));
 
-            var chars = str.ToCharArray();
+            var chars = str.ToString().ToCharArray();
             Array.Reverse(chars);
 
             return new string(chars);
         }
+
+        private static int ToInt(char ch) => (int)(ch - '0');
+        private static char ToChar(int sum) => (char)(sum % 10 + '0');
 
         public static string ReverseString(string str)
         {
@@ -90,7 +88,7 @@ namespace ConsoleApp
 
         public static List<string> GetPhoneNumbers(string str)
         {
-            var regex = new Regex(@"((\+\d{1,3})|\d{1})\s((\(\d{2,3}\))|(\d{2,3}))\s(\d{3})\-(\d{2,4})(\-(\d{2,4})|)", RegexOptions.IgnoreCase);
+            var regex = new Regex(@"((\+(\d|\d{3}))|(\s\d))\s((\(\d{2,3}\))|(\d{3}))\s(\d{3})\-((\d{2}\-\d{2})|\d{4})", RegexOptions.IgnoreCase);
             MatchCollection matches = regex.Matches(str);
 
             return matches.Select(match => match.Value).ToList();
@@ -98,7 +96,7 @@ namespace ConsoleApp
 
         private static string[] GetWordsFromString(string str, char[] delimiterChars)
         {
-            if (str == "")
+            if (string.IsNullOrWhiteSpace(str))
                 throw new ArgumentException("Empty string");
 
             var words =
