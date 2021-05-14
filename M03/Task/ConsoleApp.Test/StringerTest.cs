@@ -89,14 +89,9 @@ namespace ConsoleApp.Test
                 Throws.Exception.TypeOf<ArgumentException>());
         }
 
-        [Test]
-        public void GetSumOfNums_Strings_StringWithSumNums()
+        [TestCase( "123","123","246")]
+        public void GetSumOfNums_Strings_StringWithSumNums(string str1,string str2,string expected)
         {
-            //Arrange
-            var str1 = "123";
-            var str2 = "123";
-            var expected = (int.Parse(str1)+int.Parse(str2)).ToString();
-
             //Act
             var result = Stringer.GetSumOfNums(str1, str2);
 
