@@ -15,47 +15,63 @@ namespace MyLib
 
         public static int StringToInt(string str)
         {
-            _logger.LogInformation("Checking string for valid arguments");
-            if (string.IsNullOrWhiteSpace(str))
-            {
-                var ex = new ArgumentException();
-                _logger.LogError(ex, "Can not convert to int this string");
-                throw ex;
-            }
-
             str = str.Trim();
 
-            bool negative = false;
-            if (str[0] == '-')
-            {
-                negative = true;
-                str = str.Trim('-');
-            }
-
-            _logger.LogInformation("Checking string characters");
-            if (!str.All(char.IsDigit))
-            {
-                var ex = new ArgumentException();
-                _logger.LogError(ex, "Not all values are numbers");
-                throw ex;
-            }
-
+            CheckStringNotNull(str);
+            var negative = CheckStringIsNegative(ref str);
+            CheckStringIsDigit(str);
 
             _logger.LogInformation("Trying to parse");
-            uint result = 0;
+            var result = 0;
             foreach (var ch in str)
             {
-                result *= 10;
-                result += (uint)(ch - '0');
-
-                if (negative == false & result > int.MaxValue | negative & -result < int.MinValue) {
-                    var ex = new ArgumentOutOfRangeException();
+                try
+                {
+                    checked
+                    {
+                        result *= 10;
+                        result += ch - '0';
+                    }
+                }
+                catch (OverflowException ex)
+                {
                     _logger.LogError(ex, "Values in string out of range Int32");
-                    throw ex;
+                    throw;
                 }
             }
 
-            return negative ? -(int)result : (int)result;
+            return negative ? -result : result;
+        }
+
+        internal static void CheckStringNotNull(string str)
+        {
+            _logger.LogInformation("Checking string for valid arguments");
+            if (!string.IsNullOrEmpty(str)) return;
+
+            var ex = new ArgumentException();
+            _logger.LogError(ex, "Can not convert to int this string");
+            throw ex;
+        }
+
+        internal static void CheckStringIsDigit(string str)
+        {
+            _logger.LogInformation("Checking string characters");
+            if (str.All(char.IsDigit)) return;
+
+            var ex = new ArgumentException();
+            _logger.LogError(ex, "Not all values are numbers");
+            throw ex;
+        }
+
+        internal static bool CheckStringIsNegative(ref string str)
+        {
+            if (str[0] == '-')
+            {
+                str = str.Trim('-');
+                return true;
+            }
+
+            return false;
         }
     }
 }
