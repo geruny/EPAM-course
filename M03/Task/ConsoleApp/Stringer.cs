@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -88,7 +88,7 @@ namespace ConsoleApp
 
         public static List<string> GetPhoneNumbers(string str)
         {
-            var regex = new Regex(@"((\+(\d|\d{3}))|(\s\d))\s((\(\d{2,3}\))|(\d{3}))\s(\d{3})\-((\d{2}\-\d{2})|\d{4})", RegexOptions.IgnoreCase);
+            var regex = new Regex(@"^((\+(\d|\d{3}))|(\s\d))\s((\(\d{2,3}\))|(\d{3}))\s(\d{3})\-((\d{2}\-\d{2})|\d{4})$", RegexOptions.IgnoreCase);
             MatchCollection matches = regex.Matches(str);
 
             return matches.Select(match => match.Value).ToList();
