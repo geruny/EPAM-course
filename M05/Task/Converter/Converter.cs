@@ -18,7 +18,11 @@ namespace MyLib
             str = str.Trim();
 
             CheckStringNotNull(str);
-            var negative = CheckStringIsNegative(ref str);
+
+            var negative = CheckStringIsNegative(str);
+            if(negative)
+                str = str.Trim('-');
+
             CheckStringIsDigit(str);
 
             _logger.LogInformation("Trying to parse");
@@ -63,15 +67,6 @@ namespace MyLib
             throw ex;
         }
 
-        internal static bool CheckStringIsNegative(ref string str)
-        {
-            if (str[0] == '-')
-            {
-                str = str.Trim('-');
-                return true;
-            }
-
-            return false;
-        }
+        internal static bool CheckStringIsNegative(string str) => str[0] == '-';
     }
 }
