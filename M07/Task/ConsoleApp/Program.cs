@@ -14,19 +14,17 @@ namespace MatrixSortApp
         private static void Main(string[] args)
         {
             PrintL("Initial matrix");
-            for (var i = 0; i < _matrix.GetLength(0); i++)
-            {
-                for (var j = 0; j < _matrix.GetLength(1); j++)
-                {
-                    Print(_matrix[i, j] + " ");
-                }
-                PrintL();
-            }
+            PrintMatrix();
 
             Matrix.Sort(_matrix, Matrix.Operation.Asc, SortMethods.MinValueInRow);
 
             PrintL();
             PrintL("Sorted matrix");
+            PrintMatrix();
+        }
+
+        private static void PrintMatrix()
+        {
             for (var i = 0; i < _matrix.GetLength(0); i++)
             {
                 for (var j = 0; j < _matrix.GetLength(1); j++)
