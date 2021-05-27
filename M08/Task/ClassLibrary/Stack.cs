@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace MyLibrary
 {
@@ -40,7 +40,7 @@ namespace MyLibrary
                 throw new IndexOutOfRangeException("Stack is empty");
         }
 
-        public IEnumerator GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
             return new StackIterator<T>(_top);
         }

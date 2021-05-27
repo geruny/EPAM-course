@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace MyLibrary
 {
-    public class ClassLib
+    public static class ClassLib
     {
         public static int BinarySearch<T>(T[] array, T search) where T : IComparable<T>
         {

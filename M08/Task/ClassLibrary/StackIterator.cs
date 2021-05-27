@@ -1,11 +1,15 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace MyLibrary
 {
-    internal class StackIterator<T> : IEnumerator
+    internal class StackIterator<T> : IEnumerator<T>
     {
         private readonly Node<T> _top;
         private Node<T> _node;
+
+        public T Current => _node.Data;
+        object IEnumerator.Current => Current;
 
         public StackIterator(Node<T> top)
         {
@@ -23,6 +27,6 @@ namespace MyLibrary
 
         public void Reset() => _node = _top;
 
-        public object Current => _node.Data;
+        public void Dispose() { }
     }
 }

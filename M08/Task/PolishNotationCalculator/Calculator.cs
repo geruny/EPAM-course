@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace PolishNotationCalculator
 {
@@ -13,15 +14,14 @@ namespace PolishNotationCalculator
             {
                 if (char.IsDigit(input[i]))
                 {
-                    var digit = string.Empty;
-
+                    var digit = new StringBuilder();
                     while (!IsDelimiter(input[i]) & !IsOperator(input[i]))
                     {
-                        digit += input[i];
+                        digit.Append(input[i]);
                         i++;
                         if (i.Equals(input.Length)) break;
                     }
-                    stack.Push(double.Parse(digit));
+                    stack.Push(double.Parse(digit.ToString()));
                 }
                 else if (IsOperator(input[i]))
                 {
@@ -33,7 +33,7 @@ namespace PolishNotationCalculator
                         '+' => b + a,
                         '-' => b - a,
                         '*' => b * a,
-                        '/' => b / a,
+                        '/' => b / (a == 0 ? throw new DivideByZeroException() : a),
                         '^' => Math.Pow(b, a),
                     };
 
