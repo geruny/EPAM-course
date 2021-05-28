@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31105.61
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyLibrary", "ClassLibrary\MyLibrary.csproj", "{4BD27617-56C7-4C3B-A11D-D1A3EAE6CAD0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibDemoApp", "LibDemoApp\LibDemoApp.csproj", "{9FF45EC1-EDC4-4003-BCC5-EF88ACDC06E4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolishNotationCalculator", "PolishNotationCalculator\PolishNotationCalculator.csproj", "{19305B7C-8DF3-4399-A923-5005D42D72AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyLibrary.Test", "MyLibrary.Test\MyLibrary.Test.csproj", "{FE01A029-41CC-46FC-9A12-D93861043FBB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolishNotationCalculatorTest", "PolishNotationCalculatorTest\PolishNotationCalculatorTest.csproj", "{928E1E36-9323-4ED4-98D7-C03D3BAE259D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4BD27617-56C7-4C3B-A11D-D1A3EAE6CAD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BD27617-56C7-4C3B-A11D-D1A3EAE6CAD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BD27617-56C7-4C3B-A11D-D1A3EAE6CAD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BD27617-56C7-4C3B-A11D-D1A3EAE6CAD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FF45EC1-EDC4-4003-BCC5-EF88ACDC06E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FF45EC1-EDC4-4003-BCC5-EF88ACDC06E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FF45EC1-EDC4-4003-BCC5-EF88ACDC06E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FF45EC1-EDC4-4003-BCC5-EF88ACDC06E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19305B7C-8DF3-4399-A923-5005D42D72AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19305B7C-8DF3-4399-A923-5005D42D72AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19305B7C-8DF3-4399-A923-5005D42D72AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19305B7C-8DF3-4399-A923-5005D42D72AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE01A029-41CC-46FC-9A12-D93861043FBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE01A029-41CC-46FC-9A12-D93861043FBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE01A029-41CC-46FC-9A12-D93861043FBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE01A029-41CC-46FC-9A12-D93861043FBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{928E1E36-9323-4ED4-98D7-C03D3BAE259D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{928E1E36-9323-4ED4-98D7-C03D3BAE259D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{928E1E36-9323-4ED4-98D7-C03D3BAE259D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{928E1E36-9323-4ED4-98D7-C03D3BAE259D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2C3C7433-86B4-485F-87E0-F633CFBF8E6C}
+	EndGlobalSection
+EndGlobal
