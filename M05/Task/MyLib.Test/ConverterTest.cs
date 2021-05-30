@@ -16,7 +16,7 @@ namespace MyLib.Tests
         }
 
         [Test]
-        public void StringToInt_NullOrWhiteSpace_ArgumentException([Values(null, "", " ")] string str)
+        public void StringToInt_NullOrWhiteSpace_ArgumentException([Values("", " ")] string str)
         {
             //Act & assert
             Assert.That(() => Converter.StringToInt(str),
@@ -40,7 +40,7 @@ namespace MyLib.Tests
         {
             //Act & assert
             Assert.That(() => Converter.StringToInt(str),
-                Throws.Exception.TypeOf<ArgumentOutOfRangeException>());
+                Throws.Exception.TypeOf<OverflowException>());
         }
 
         [TestCase("123", 123)]

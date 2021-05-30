@@ -39,9 +39,6 @@ namespace ConsoleApp.Test
 
             //Assert
             Assert.That(result, Is.EqualTo(expected));
-
-            foreach (var s in result)
-                Console.WriteLine(s);
         }
 
         [Test]
