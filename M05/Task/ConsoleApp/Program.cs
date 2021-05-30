@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyLib;
 using NLog;
@@ -10,17 +9,12 @@ namespace ConsoleApp
 {
     internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var logger = LogManager.GetCurrentClassLogger();
             try
             {
-                var config = new ConfigurationBuilder()
-                    .SetBasePath(System.IO.Directory.GetCurrentDirectory()) //From NuGet Package Microsoft.Extensions.Configuration.Json | for what this line??
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true) //And this one
-                    .Build();
-
-                var servicesProvider = BuildDi(config);
+                var servicesProvider = BuildDi();
                 using (servicesProvider as IDisposable)
                 {
                     servicesProvider.GetRequiredService<Converter>();
@@ -29,8 +23,6 @@ namespace ConsoleApp
                     var numStr = Console.ReadLine();
                     PrintL();
 
-                    // var num = Converter.StringToInt("-2147483648");
-                    // var num = Converter.StringToInt(" ");
                     var num = Converter.StringToInt(numStr);
 
                     PrintL();
@@ -53,7 +45,7 @@ namespace ConsoleApp
 
         private static void PrintL(string str = "") => Console.WriteLine(str);
 
-        private static IServiceProvider BuildDi(IConfiguration config)
+        private static IServiceProvider BuildDi()
         {
             return new ServiceCollection()
                 .AddTransient<Converter>()
