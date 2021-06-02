@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using NUnit.Framework;
 using System.Linq;
 
@@ -6,34 +7,35 @@ namespace ConsoleApp.Test
     [TestFixture]
     public class StudentSorterTest
     {
-        public string Path = "TestResults.json";
-
-        [TestCase("")]
-        [TestCase("    ")]
-        public void GetStudents_EmptyOrWhiteSpaceString_ArgumentException(string input)
-        {
-            //Act & Assert
-            Assert.That(() => StudentSorter.GetStudents(Path, input),
-                Throws.ArgumentException);
-        }
+        public StudentSorter StudentSorter = new(
+            new JsonStudents("TestResults.json"),
+            new SearchHandler("-name Ivan -minmark 3 -maxmark 5 -datefrom 20.11.2019 -dateto 20.12.2021 -test Maths -sort mark desc")
+            );
 
         [TestCase("-name Ivann -minmark 3 -maxmark 5 -datefrom 20.11.2019 -dateto 20.12.2021 -test Maths -sort mark desc")]
         [TestCase("-name Ivan -minmark 3 -maxmark 5 -datefrom 20.11.2019 -dateto 20.12.2021 -test AAaaaa -sort mark desc")]
-        public void GetStudents_StringWithBadSearchValues_ArgumentNullException(string input)
+        public void GetStudents_StringWithBadSearchValues_KeyNotFoundException(string input)
         {
+            //Arrange
+            StudentSorter.SearchHandler = new SearchHandler(input);
+
             //Act & Assert
-            Assert.That(() => StudentSorter.GetStudents(Path, input),
-                Throws.ArgumentNullException);
+            Assert.That(() => StudentSorter.GetStudents(),
+                Throws.Exception.TypeOf<KeyNotFoundException>());
         }
 
+        [TestCase("-name  -minmark 3 -maxmark 5 -datefrom 20.11.2019 -dateto 20.12.2021 -test Maths -sort mark desc")]
         [TestCase("-namen Ivan -minmark 3 -maxmark 5 -datefrom 20.11.2019 -dateto 20.12.2021 -test Maths -sort mark desc")]
         [TestCase("-name -name Ivan -minmark 3 -maxmark 5 -datefrom 20.11.2019 -dateto 20.12.2021 -test Maths -sort mark desc")]
         [TestCase("Ivan -minmark 3 -maxmark 5 -datefrom 20.11.2019 -dateto 20.12.2021 -test Maths -sort mark desc")]
         [TestCase("Ivan")]
         public void GetStudents_StringWithBadFlagsOrBadCountFlags_ArgumentException(string input)
         {
+            //Arrange
+            StudentSorter.SearchHandler = new SearchHandler(input);
+
             //Act & Assert
-            Assert.That(() => StudentSorter.GetStudents(Path, input),
+            Assert.That(() => StudentSorter.GetStudents(),
                 Throws.ArgumentException);
         }
 
@@ -44,6 +46,7 @@ namespace ConsoleApp.Test
         public void GetStudents_String_SortedStudents(string input)
         {
             //Arrange
+            StudentSorter.SearchHandler = new SearchHandler(input);
             var expected = new[]
             {
                 "Ivan Pupkin Maths 5 12.03.2021",
@@ -51,7 +54,7 @@ namespace ConsoleApp.Test
             };
 
             //Act
-            var result = StudentSorter.GetStudents(Path, input);
+            var result = StudentSorter.GetStudents();
 
             //Assert
             for (var i = 0; i < result.Count(); i++)

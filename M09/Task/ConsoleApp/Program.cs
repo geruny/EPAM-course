@@ -2,7 +2,7 @@
 
 namespace ConsoleApp
 {
-    internal class Program
+    public class Program
     {
         public static void Main(string[] args)
         {
@@ -11,7 +11,8 @@ namespace ConsoleApp
             PrintL(input);
             PrintL();
 
-            var students = StudentSorter.GetStudents("TestResults.json", input);
+            var studentSorter = new StudentSorter(new JsonStudents("TestResults.json"), new SearchHandler(input));
+            var students = studentSorter.GetStudents();
 
             PrintL("Result:");
             foreach (var student in students)
