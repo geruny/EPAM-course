@@ -94,7 +94,7 @@ namespace ConsoleApp
             return matches.Select(match => match.Value).ToList();
         }
 
-        private static string[] GetWordsFromString(string str, char[] delimiterChars)
+        public static string[] GetWordsFromString(string str, char[] delimiterChars)
         {
             if (string.IsNullOrWhiteSpace(str))
                 throw new ArgumentException("Empty string");

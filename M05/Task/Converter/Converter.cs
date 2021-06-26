@@ -47,7 +47,7 @@ namespace MyLib
             return negative ? -result : result;
         }
 
-        internal static void CheckStringNotNull(string str)
+        private static void CheckStringNotNull(string str)
         {
             _logger.LogInformation("Checking string for valid arguments");
             if (!string.IsNullOrEmpty(str)) return;
@@ -57,7 +57,7 @@ namespace MyLib
             throw ex;
         }
 
-        internal static void CheckStringIsDigit(string str)
+        private static void CheckStringIsDigit(string str)
         {
             _logger.LogInformation("Checking string characters");
             if (str.All(char.IsDigit)) return;
@@ -67,6 +67,6 @@ namespace MyLib
             throw ex;
         }
 
-        internal static bool CheckStringIsNegative(string str) => str[0] == '-';
+        private static bool CheckStringIsNegative(string str) => str[0] == '-';
     }
 }
