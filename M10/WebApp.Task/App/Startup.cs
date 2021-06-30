@@ -2,8 +2,8 @@ using App.Domain.core.Models;
 using App.Domain.Interfaces;
 using App.Infrastructure.Business;
 using App.Infrastructure.Data;
+using App.Infrastructure.Data.Repositories;
 using App.Services.Interfaces;
-using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +41,10 @@ namespace App
             services.AddScoped<IGenericBaseRepository<Lecture>, BaseRepository<Lecture>>();
             services.AddScoped<IGenericBaseRepository<Homework>, BaseRepository<Homework>>();
 
+            services.AddScoped<ILecturesStudentsRepository, LecturesStudentsRepository>();
+            services.AddScoped<IStudentsLectureService, StudentsLectureService>();
+            services.AddScoped<IStudentHomeworksService, StudentHomeworksService>();
+
             services.AddScoped<ISender, MailSender>();
             services.AddScoped<ISender, MessageSender>();
 
@@ -52,12 +56,13 @@ namespace App
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "App v1"));
-            }
 
-            db.Database.EnsureDeleted();
-            db.Database.EnsureCreated();
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+            }
 
             app.UseHttpsRedirection();
 

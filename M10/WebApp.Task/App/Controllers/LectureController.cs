@@ -35,7 +35,7 @@ namespace App.Controllers
             return Ok(lecturesList);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public ActionResult<LectureApp> Get(int id)
         {
             var lecture =_mapper.Map<LectureApp>(_repo.GetById(id));
@@ -68,7 +68,7 @@ namespace App.Controllers
             return Ok();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public IActionResult Delete(int id)
         {
             if (_repo.GetById(id) == null)

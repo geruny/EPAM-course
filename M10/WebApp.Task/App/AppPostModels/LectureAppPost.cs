@@ -6,6 +6,6 @@ namespace App.AppPostModels
     {
         public int LectorId { get; set; }
         public string Name { get; set; }
-        public DateTime Date { get; set; }
+        public DateTime DateEvent { get; set; }
     }
 }

@@ -6,7 +6,6 @@ namespace App.AppPostModels
     {
         public int StudentId { get; set; }
         public string Name { get; set; }
-        public DateTime Date { get; set; }
-        public int Mark { get; set; }
+        public DateTime DatePass { get; set; }
     }
 }

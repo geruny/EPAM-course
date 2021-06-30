@@ -9,9 +9,9 @@ namespace App.Unit.Tests
     {
         public readonly List<TEntity> List = new()
         {
-            new TEntity() { Id = 1, Name = "Test1", Date = new DateTime(2021, 11, 09) },
-            new TEntity() { Id = 2, Name = "Test2", Date = new DateTime(2021, 10, 24) },
-            new TEntity() { Id = 3, Name = "Test3", Date = new DateTime(2021, 09, 14) }
+            new TEntity() { Id = 1, Name = "Test1" },
+            new TEntity() { Id = 2, Name = "Test2"},
+            new TEntity() { Id = 3, Name = "Test3" }
         };
 
         public IEnumerable<TEntity> Get()

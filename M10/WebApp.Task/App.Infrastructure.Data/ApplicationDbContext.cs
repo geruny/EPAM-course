@@ -11,13 +11,14 @@ namespace App.Infrastructure.Data
         public DbSet<Lector> Lectors { get; set; }
         public DbSet<Lecture> Lectures { get; set; }
         public DbSet<Homework> Homeworks { get; set; }
+        public DbSet<LecturesStudents> LecturesStudents { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            new HomeWorkEntityConfiguration().Configure(modelBuilder.Entity<Homework>());
+            new HomeworkEntityConfiguration().Configure(modelBuilder.Entity<Homework>());
             new StudentEntityConfiguration().Configure(modelBuilder.Entity<Student>());
             new LectorEntityConfiguration().Configure(modelBuilder.Entity<Lector>());
             new LectureEntityConfiguration().Configure(modelBuilder.Entity<Lecture>());

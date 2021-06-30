@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
+using App.AppModels;
 using App.AppPostModels;
 using AutoMapper;
 
@@ -25,19 +26,19 @@ namespace App.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Lector>> Get()
+        public ActionResult<IEnumerable<LectorApp>> Get()
         {
-            var lectorsList = _repo.Get();
+            var lectorsList = _mapper.Map<IEnumerable<Lector>,List<LectorApp>>(_repo.Get());
             if (!lectorsList.Any())
                 return NotFound();
 
             return Ok(lectorsList);
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<Lector> Get(int id)
+        [HttpGet("{id:int}")]
+        public ActionResult<LectorApp> Get(int id)
         {
-            var lector = _repo.GetById(id);
+            var lector = _mapper.Map<LectorApp>(_repo.GetById(id));
             if (lector == null)
                 return NotFound();
 
@@ -55,8 +56,10 @@ namespace App.Controllers
         }
 
         [HttpPut]
-        public IActionResult Put(Lector lector)
+        public IActionResult Put(LectorApp lectorInput)
         {
+            var lector = _mapper.Map<Lector>(lectorInput);
+
             if (_repo.GetById(lector.Id) == null)
                 return NotFound();
 
@@ -64,7 +67,7 @@ namespace App.Controllers
             return Ok();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public IActionResult Delete(int id)
         {
             if (_repo.GetById(id) == null)

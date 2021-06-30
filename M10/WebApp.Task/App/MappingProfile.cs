@@ -15,13 +15,10 @@ namespace App
             CreateMap<LectureAppPost, Lecture>();
             CreateMap<HomeworkAppPost, Homework>();
 
-            CreateMap<Student, StudentApp>();
-            CreateMap<Lecture, LectureApp>();
-            CreateMap<Homework, HomeworkApp>();
-
-            CreateMap<StudentApp, Student>();
-            CreateMap<LectureApp, Lecture>();
-            CreateMap<HomeworkApp, Homework>();
+            CreateMap<Student, StudentApp>().ReverseMap();
+            CreateMap<Lector, LectorApp>().ReverseMap();
+            CreateMap<Lecture, LectureApp>().ReverseMap();
+            CreateMap<Homework, HomeworkApp>().ReverseMap();
         }
     }
 }

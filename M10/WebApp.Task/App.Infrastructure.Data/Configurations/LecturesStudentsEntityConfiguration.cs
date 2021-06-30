@@ -13,7 +13,6 @@ namespace App.Infrastructure.Data.Configurations
             builder.HasOne(l => l.Lecture)
                 .WithMany(ls => ls.LecturesStudents)
                 .HasForeignKey(l => l.LectureId);
-
             builder.HasOne(s => s.Student)
                 .WithMany(ls => ls.LecturesStudents)
                 .HasForeignKey(s => s.StudentId);

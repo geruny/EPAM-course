@@ -1,4 +1,5 @@
-﻿using App.Domain.core;
+﻿using System;
+using App.Domain.core;
 
 namespace App.AppModels
 {
@@ -6,5 +7,6 @@ namespace App.AppModels
     {
         public int StudentId { get; set; }
         public int Mark { get; set; }
+        public DateTime DatePass { get; set; }
     }
 }
