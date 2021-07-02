@@ -1,6 +1,7 @@
 ﻿using App.AppPostModels;
 using App.Services.Interfaces;
 using App.Services.Models;
+using App.Services.Models.StudentLectureServiceModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 

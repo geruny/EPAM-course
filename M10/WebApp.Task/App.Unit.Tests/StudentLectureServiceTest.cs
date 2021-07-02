@@ -8,6 +8,7 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using App.Services.Models.StudentLectureServiceModels;
 using Range = Moq.Range;
 
 namespace App.Unit.Tests
@@ -98,7 +99,7 @@ namespace App.Unit.Tests
 
             //Assert
             Assert.That(result, Is.TypeOf<StudentsLectureOutput>());
-            Assert.That(result.Students, Is.TypeOf<List<StudentServicesModel>>());
+            Assert.That(result.Students, Is.TypeOf<List<StudentsLectureSubmodel>>());
             Assert.AreEqual(_lectureId, result.LectureId);
             Assert.AreEqual(_lectureName, result.LectureName);
             Assert.That(result.Students.Count == 3);

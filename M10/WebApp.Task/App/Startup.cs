@@ -26,7 +26,7 @@ namespace App
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddXmlSerializerFormatters();
 
             services.AddSwaggerGen(c =>
             {
@@ -46,6 +46,7 @@ namespace App
             services.AddScoped<IStudentsLectureService, StudentsLectureService>();
             services.AddScoped<IStudentHomeworksService, StudentHomeworksService>();
             services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<IReporter, Reporter>();
 
             services.AddScoped<MailSender>();
             services.AddScoped<MessageSender>();

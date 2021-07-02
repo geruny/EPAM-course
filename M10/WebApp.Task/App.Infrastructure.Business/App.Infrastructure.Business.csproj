@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\App.Domain.Interfaces\App.Domain.Interfaces.csproj" />
     <ProjectReference Include="..\App.Services.Interfaces\App.Services.Interfaces.csproj" />
     <ProjectReference Include="..\Domain.core\App.Domain.core.csproj" />

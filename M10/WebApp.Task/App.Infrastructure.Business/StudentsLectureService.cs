@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using App.Domain.core.Models;
 using App.Services.Models;
+using App.Services.Models.StudentLectureServiceModels;
 
 namespace App.Infrastructure.Business
 {
@@ -33,7 +34,7 @@ namespace App.Infrastructure.Business
                 .Select(s => s.StudentId);
 
             var listOutputStudents = studentsId.Select(studentId =>
-                new StudentServicesModel()
+                new StudentsLectureSubmodel()
                 {
                     StudentId = studentId,
                     StudentName = _repoStudent.GetById(studentId).Name

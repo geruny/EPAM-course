@@ -1,6 +1,6 @@
-﻿namespace App.Services.Models
+﻿namespace App.Services.Models.StudentLectureServiceModels
 {
-    public class StudentServicesModel
+    public class StudentsLectureSubmodel
     {
         public int StudentId { get; set; }
         public string StudentName { get; set; }
