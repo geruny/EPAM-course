@@ -5,7 +5,7 @@ namespace App.Infrastructure.Business
 {
     public class MessageSender:ISender
     {
-        public bool Send()
+        public void Send(string receiver)
         {
             throw new NotImplementedException();
         }

@@ -19,8 +19,9 @@ namespace App.Unit.Tests
         {
             new LecturesStudents() { LectureId = 1, StudentId = 1 },
             new LecturesStudents() { LectureId = 1, StudentId = 2 },
+            new LecturesStudents() { LectureId = 1, StudentId = 3 },
             new LecturesStudents() { LectureId = 2, StudentId = 1 },
-            new LecturesStudents() { LectureId = 2, StudentId = 3 }
+            new LecturesStudents() { LectureId = 2, StudentId = 3 },
         };
 
         private readonly List<Student> _students = new()
@@ -57,61 +58,75 @@ namespace App.Unit.Tests
             new Lecture() { Id = 2, LectorId = 1, Name = "Module 2", DateEvent = new DateTime(2021, 02, 08) }
         };
 
+        private int _lectureId;
+        private string _lectureName;
+
         private readonly MockRepository _mockRepo = new(MockBehavior.Default);
+        private Mock<ILecturesStudentsRepository> _mockLecturesStudentsRepo;
+        private Mock<IGenericBaseRepository<Lecture>> _mockLectureRepo;
+        private Mock<IGenericBaseRepository<Student>> _mockStudentRepo;
+        private Mock<IStudentHomeworksService> _mockStudentHomeworkService;
+        private Mock<IStudentService> _mockStudentService;
         private StudentsLectureService _service;
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            _lectureId = _lectures[0].Id;
+            _lectureName = _lectures[0].Name;
+
+            _mockLecturesStudentsRepo = _mockRepo.Create<ILecturesStudentsRepository>();
+            _mockLectureRepo = _mockRepo.Create<IGenericBaseRepository<Lecture>>();
+            _mockStudentRepo = _mockRepo.Create<IGenericBaseRepository<Student>>();
+            _mockStudentHomeworkService = _mockRepo.Create<IStudentHomeworksService>();
+            _mockStudentService = _mockRepo.Create<IStudentService>();
+
+            _mockLecturesStudentsRepo.Setup(repo => repo.Get()).Returns(_lecturesStudents);
+            _mockLectureRepo.Setup(repo => repo.GetById(_lectureId)).Returns(_lectures[0]);
+            _mockStudentRepo.Setup(repo => repo.GetById(It.Is<int>(id=>id>=0))).Returns(_students[0]);
+        }
 
         [Test]
         public void GetStudents_LectureId_StudentsLectureOutput()
         {
             //Arrange
-            var lectureId = _lectures[0].Id;
-            var lectureName = _lectures[0].Name;
-
-            var mockLecturesStudentsRepo = _mockRepo.Create<ILecturesStudentsRepository>();
-            mockLecturesStudentsRepo.Setup(repo => repo.Get()).Returns(_lecturesStudents);
-
-            var mockLectureRepo = _mockRepo.Create<IGenericBaseRepository<Lecture>>();
-            mockLectureRepo.Setup(repo => repo.GetById(lectureId)).Returns(_lectures[lectureId - 1]);
-
-            var mockStudentsRepo = _mockRepo.Create<IGenericBaseRepository<Student>>();
-            mockStudentsRepo.Setup(repo => repo.GetById(It.IsInRange(1, 2, Range.Inclusive))).Returns(_students[0]);
-
-            var mockStudentHomeworkService = _mockRepo.Create<IStudentHomeworksService>();
-
-            _service = new StudentsLectureService(mockLecturesStudentsRepo.Object, mockLectureRepo.Object,
-                mockStudentsRepo.Object, mockStudentHomeworkService.Object);
+            _service = new StudentsLectureService(_mockLecturesStudentsRepo.Object, _mockLectureRepo.Object,
+                _mockStudentRepo.Object, _mockStudentHomeworkService.Object,_mockStudentService.Object);
 
             //Act
-            var result = _service.GetStudents(lectureId);
+            var result = _service.GetStudents(_lectureId);
 
             //Assert
             Assert.That(result, Is.TypeOf<StudentsLectureOutput>());
             Assert.That(result.Students, Is.TypeOf<List<StudentServicesModel>>());
-            Assert.AreEqual(lectureId, result.LectureId);
-            Assert.AreEqual(lectureName, result.LectureName);
-            Assert.That(result.Students.Count == 2);
+            Assert.AreEqual(_lectureId, result.LectureId);
+            Assert.AreEqual(_lectureName, result.LectureName);
+            Assert.That(result.Students.Count == 3);
         }
 
         [Test]
         public void AddStudents_LectureIdStudentsId_StudentsLectureOutput()
         {
             //Arrange
-            var lectureId = _lectures[0].Id;
-            var lectureName = _lectures[0].Name;
+            var callBackCreatedLecturesStudents = new List<LecturesStudents>();
 
-            var mockLecturesStudentsRepo = _mockRepo.Create<ILecturesStudentsRepository>();
-            mockLecturesStudentsRepo.Setup(repo => repo.Get()).Returns(_lecturesStudents);
+            _mockLecturesStudentsRepo.Setup(repo =>
+                    repo.Create(It.Is<LecturesStudents>(ls => ls.LectureId == _lectureId && ls.StudentId >= 1)))
+                .Callback<LecturesStudents>(ls => callBackCreatedLecturesStudents.Add(ls));
+            _mockStudentRepo.Setup(repo => repo.Get()).Returns(_students);
+            _mockStudentHomeworkService.Setup(repo =>
+                repo.SetHomeworkMark(It.IsAny<int>(), _lectureId, It.IsInRange(1, 5, Range.Inclusive)));
+            _mockStudentService.Setup(service => service.CheckStudentTurnout(It.Is<int>(id => id >= 0)));
 
-            var mockLectureRepo = _mockRepo.Create<IGenericBaseRepository<Lecture>>();
-            mockLectureRepo.Setup(repo => repo.GetById(lectureId)).Returns(_lectures[lectureId - 1]);
+            _service = new StudentsLectureService(_mockLecturesStudentsRepo.Object, _mockLectureRepo.Object,
+                _mockStudentRepo.Object, _mockStudentHomeworkService.Object,_mockStudentService.Object);
 
-            var mockStudentsRepo = _mockRepo.Create<IGenericBaseRepository<Student>>();
-            mockStudentsRepo.Setup(repo => repo.GetById(It.IsInRange(1, 2, Range.Inclusive))).Returns(_students[0]);
+            //Act
+            var result= _service.AddStudents(_lectureId, new List<int> {1, 2, 3});
 
-            var mockStudentHomeworkService = _mockRepo.Create<IStudentHomeworksService>();
-
-            _service = new StudentsLectureService(mockLecturesStudentsRepo.Object, mockLectureRepo.Object,
-                mockStudentsRepo.Object, mockStudentHomeworkService.Object);
+            //Assert
+            Assert.That(result, Is.TypeOf<StudentsLectureOutput>());
+            Assert.AreEqual(3,callBackCreatedLecturesStudents.Count);
         }
     }
 }

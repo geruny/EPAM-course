@@ -3,31 +3,42 @@ using System.Collections.Generic;
 using System.Linq;
 using App.Domain.core;
 using App.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace App.Infrastructure.Data.Repositories
 {
     public class BaseRepository<TEntity> : IGenericBaseRepository<TEntity> where TEntity : BaseModel
     {
+        private readonly ILogger<BaseRepository<TEntity>> _logger;
         private readonly ApplicationDbContext _context;
 
-        public BaseRepository(ApplicationDbContext context)
+        public BaseRepository(ApplicationDbContext context, ILogger<BaseRepository<TEntity>> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public IEnumerable<TEntity> Get()
         {
             var itemList = _context.Set<TEntity>().ToList();
             if (!itemList.Any())
-                throw new NullReferenceException($"Items {typeof(TEntity)} in DB not found");
+            {
+                var ex = new NullReferenceException($"Items {typeof(TEntity)} in DB not found");
+                _logger.LogError(ex, "Error in Base repository");
+            }
 
             return itemList;
         }
 
         public TEntity GetById(int id)
         {
-            var item = _context.Set<TEntity>().Find(id) ??
-                     throw new NullReferenceException($"Item {typeof(TEntity)} in DB not found");
+            var item = _context.Set<TEntity>().Find(id);
+
+            if (item == null)
+            {
+                var ex = new NullReferenceException($"Item {typeof(TEntity)} in DB not found");
+                _logger.LogError(ex, "Error in Base repository");
+            }
 
             return item;
         }
@@ -37,14 +48,12 @@ namespace App.Infrastructure.Data.Repositories
             _context.Set<TEntity>().Add(item);
             _context.SaveChanges();
 
-            TEntity createdItem;
-            try
+            var createdItem = GetById(item.Id);
+
+            if (createdItem == null)
             {
-                createdItem = GetById(item.Id);
-            }
-            catch (NullReferenceException)
-            {
-                throw new NullReferenceException($"Item {typeof(TEntity)} in DB was not created");
+                var ex= new NullReferenceException($"Item {typeof(TEntity)} in DB was not created");
+                _logger.LogError(ex, "Error in Base repository");
             }
 
             return createdItem;

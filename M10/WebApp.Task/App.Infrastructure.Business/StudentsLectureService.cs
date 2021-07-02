@@ -15,13 +15,15 @@ namespace App.Infrastructure.Business
         private readonly IGenericBaseRepository<Lecture> _repoLecture;
         private readonly IGenericBaseRepository<Student> _repoStudent;
         private readonly IStudentHomeworksService _studentHomeworksService;
+        private readonly IStudentService _studentService;
 
-        public StudentsLectureService(ILecturesStudentsRepository repoStudentsLecture, IGenericBaseRepository<Lecture> repoLecture, IGenericBaseRepository<Student> repoStudent, IStudentHomeworksService studentHomeworksService)
+        public StudentsLectureService(ILecturesStudentsRepository repoStudentsLecture, IGenericBaseRepository<Lecture> repoLecture, IGenericBaseRepository<Student> repoStudent, IStudentHomeworksService studentHomeworksService, IStudentService studentService)
         {
             _repoStudentsLecture = repoStudentsLecture;
             _repoLecture = repoLecture;
             _repoStudent = repoStudent;
             _studentHomeworksService = studentHomeworksService;
+            _studentService = studentService;
         }
 
         public StudentsLectureOutput GetStudents(int lectureId)
@@ -52,34 +54,25 @@ namespace App.Infrastructure.Business
         {
             var allStudentsId = _repoStudent.Get().Select(s => s.Id);
 
-            var existStudentsInDb = studentsId.Except(allStudentsId);
-            if (existStudentsInDb.Any())
-                throw new ArgumentException("Not all students are exist in DB");
-
             var absentStudentsId = allStudentsId.Except(studentsId);
-
             if (absentStudentsId.Any())
             {
                 foreach (var studentId in absentStudentsId)
                 {
-                    var homework = _studentHomeworksService.GetStudentHomework(studentId, lectureId);
-                    if (homework != null)
-                        _studentHomeworksService.SetHomeworkMark(homework, 0);
+                    _studentService.CheckStudentTurnout(studentId);
+                    _studentHomeworksService.SetHomeworkMark(studentId, lectureId, 0);
                 }
             }
 
             foreach (var studentId in studentsId)
             {
-                var createdResult = _repoStudentsLecture.Create(new LecturesStudents()
+                _repoStudentsLecture.Create(new LecturesStudents()
                 {
-                    LectureId = lectureId, 
+                    LectureId = lectureId,
                     StudentId = studentId
                 });
 
-                if (createdResult == null)
-                    return null;
-
-                _studentHomeworksService.CheckStudentHomework(studentId, lectureId);
+                _studentHomeworksService.SetHomeworkMark(studentId, lectureId, new Random().Next(1, 5));
             }
 
             return GetStudents(lectureId);

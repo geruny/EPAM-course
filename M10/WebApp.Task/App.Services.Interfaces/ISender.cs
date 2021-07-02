@@ -8,6 +8,6 @@ namespace App.Services.Interfaces
 {
     public interface ISender
     {
-        public bool Send();
+        public void Send(string receiver);
     }
 }

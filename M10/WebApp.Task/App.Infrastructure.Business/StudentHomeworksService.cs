@@ -1,7 +1,6 @@
 ﻿using App.Domain.core.Models;
 using App.Domain.Interfaces;
 using App.Services.Interfaces;
-using System;
 using System.Linq;
 
 namespace App.Infrastructure.Business
@@ -10,18 +9,34 @@ namespace App.Infrastructure.Business
     {
         private readonly IGenericBaseRepository<Homework> _repoHomework;
         private readonly IGenericBaseRepository<Lecture> _repoLecture;
+        private readonly IStudentService _studentService;
 
-        public StudentHomeworksService(IGenericBaseRepository<Homework> repoHomework, IGenericBaseRepository<Lecture> repoLecture)
+        public StudentHomeworksService(IGenericBaseRepository<Homework> repoHomework, IGenericBaseRepository<Lecture> repoLecture, IStudentService studentService)
         {
             _repoHomework = repoHomework;
             _repoLecture = repoLecture;
+            _studentService = studentService;
         }
 
-        public void CheckStudentHomework(int studentId, int lectureId)
+        public bool CheckStudentHomework(int studentId, int lectureId)
         {
-            var studentHomework = GetStudentHomework(studentId, lectureId);
-            if (studentHomework != null)
-                SetHomeworkMark(studentHomework, new Random().Next(1, 5));
+            var homework = GetStudentHomework(studentId, lectureId);
+
+            if (homework == null)
+            {
+                var lecture = _repoLecture.GetById(lectureId);
+                _repoHomework.Create(new Homework()
+                {
+                    StudentId = studentId,
+                    Name = lecture.Name,
+                    DatePass = lecture.DateEvent,
+                    Mark = 0
+                });
+
+                return false;
+            }
+
+            return true;
         }
 
         public Homework GetStudentHomework(int studentId, int lectureId)
@@ -31,27 +46,23 @@ namespace App.Infrastructure.Business
                 .Where(h => h.StudentId == studentId && h.Name == lecture.Name);
 
             if (!homework.Any())
-            {
-                _repoHomework.Create(new Homework()
-                {
-                    StudentId = studentId,
-                    Name = lecture.Name,
-                    DatePass = lecture.DateEvent,
-                    Mark = 0
-                });
-
                 return null;
-            }
 
             return homework.First();
         }
 
-        public void SetHomeworkMark(Homework homework, int mark)
+        public void SetHomeworkMark(int studentId, int lectureId, int mark)
         {
-            if (homework == null) throw new ArgumentNullException(nameof(homework));
+            var isHomeworkExist = CheckStudentHomework(studentId, lectureId);
 
-            homework.Mark = mark;
-            _repoHomework.Update(homework);
+            if (isHomeworkExist)
+            {
+                var homework = GetStudentHomework(studentId, lectureId);
+                homework.Mark = mark;
+                _repoHomework.Update(homework);
+            }
+
+            _studentService.CheckStudentAverageScore(studentId);
         }
     }
 }

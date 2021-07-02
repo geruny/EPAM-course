@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using App.Domain.core.Models;
 using App.Domain.Interfaces;
 using App.Infrastructure.Business;
@@ -44,9 +45,19 @@ namespace App
             services.AddScoped<ILecturesStudentsRepository, LecturesStudentsRepository>();
             services.AddScoped<IStudentsLectureService, StudentsLectureService>();
             services.AddScoped<IStudentHomeworksService, StudentHomeworksService>();
+            services.AddScoped<IStudentService, StudentService>();
 
-            services.AddScoped<ISender, MailSender>();
-            services.AddScoped<ISender, MessageSender>();
+            services.AddScoped<MailSender>();
+            services.AddScoped<MessageSender>();
+            services.AddTransient<ServiceFactory.ServiceResolver>(serviceProvider => serviceType =>
+            {
+                return serviceType switch
+                {
+                    ServiceFactory.ServiceType.MailSender => serviceProvider.GetService<MailSender>(),
+                    ServiceFactory.ServiceType.MessageSender => serviceProvider.GetService<MessageSender>(),
+                    _ => throw new KeyNotFoundException("Service not found")
+                };
+            });
 
             services.AddAutoMapper(typeof(MappingProfile));
         }
