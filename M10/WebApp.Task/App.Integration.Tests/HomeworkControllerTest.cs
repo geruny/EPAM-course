@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace App.Integration.Tests
 {
     [TestFixture]
-    public class StudentControllerTest
+    public class HomeworkControllerTest
     {
         private WebApplicationFactory<Startup> _webHost;
 
@@ -45,34 +45,34 @@ namespace App.Integration.Tests
             var httpClient = _webHost.CreateClient();
 
             //Act
-            var response = await httpClient.GetAsync("Student/");
+            var response = await httpClient.GetAsync("Homework/");
 
             //Assert
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
             var stringResponse = await response.Content.ReadAsStringAsync();
-            var studentsRespons = JsonConvert.DeserializeObject<IEnumerable<Student>>(stringResponse);
+            var resultResponse = JsonConvert.DeserializeObject<IEnumerable<Homework>>(stringResponse);
 
-            Assert.AreEqual(dbContext.Students.Count(), studentsRespons.Count());
+            Assert.AreEqual(dbContext.Homeworks.Count(), resultResponse.Count());
         }
 
         [Test]
-        public async Task Get_StudentId_Ok()
+        public async Task Get_HomeworkId_Ok()
         {
             //Arrange
             var dbContext = _webHost.Services.CreateScope().ServiceProvider.GetService<ApplicationDbContext>();
             var httpClient = _webHost.CreateClient();
 
             //Act
-            var response = await httpClient.GetAsync("Student/1");
+            var response = await httpClient.GetAsync("Homework/1");
 
             //Assert
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
             var stringResponse = await response.Content.ReadAsStringAsync();
-            var studentsRespons = JsonConvert.DeserializeObject<Student>(stringResponse);
+            var resultResponse = JsonConvert.DeserializeObject<Homework>(stringResponse);
 
-            Assert.AreEqual(dbContext.Students.Find(1).Name, studentsRespons.Name);
+            Assert.AreEqual(dbContext.Homeworks.Find(1).Name, resultResponse.Name);
         }
 
         [Test]
@@ -82,27 +82,26 @@ namespace App.Integration.Tests
             var httpClient = _webHost.CreateClient();
 
             //Act
-            var response = await httpClient.GetAsync("Student/0");
+            var response = await httpClient.GetAsync("Homework/0");
 
             //Assert
             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Test]
-        public async Task Post_Student_Ok()
+        public async Task Post_Homework_Ok()
         {
             //Arrange
             var httpClient = _webHost.CreateClient();
 
             var request = new
             {
-                Url = "Student/",
+                Url = "Homework/",
                 Body = new
                 {
                     Name = "Test",
-                    PhoneNumber = "89523459674",
-                    Email = "test@epam.com",
-                    DateBirth = "2021-07-02T23:18:38.047Z"
+                    DatePass = "2021-07-02T23:18:38.047Z",
+                    StudentId = 1
                 }
             };
 
@@ -116,10 +115,10 @@ namespace App.Integration.Tests
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
 
             var stringResponse = await response.Content.ReadAsStringAsync();
-            var studentsRespons = JsonConvert.DeserializeObject<Student>(stringResponse);
+            var resultResponse = JsonConvert.DeserializeObject<Homework>(stringResponse);
 
-            Assert.That(studentsRespons, Is.TypeOf<Student>());
-            Assert.AreEqual("Test", studentsRespons.Name);
+            Assert.That(resultResponse, Is.TypeOf<Homework>());
+            Assert.AreEqual("Test", resultResponse.Name);
         }
 
         [Test]
@@ -130,13 +129,12 @@ namespace App.Integration.Tests
 
             var request = new
             {
-                Url = "Student/",
+                Url = "Homework/",
                 Body = new
                 {
                     Name = "Test",
-                    PhoneNumber = 89523459674,
-                    Email = "test@epam.com",
-                    DateBirth = 11
+                    DatePass = 11,
+                    StudentId = 1
                 }
             };
 
@@ -151,7 +149,7 @@ namespace App.Integration.Tests
         }
 
         [Test]
-        public async Task Put_Student_Ok()
+        public async Task Put_Homework_Ok()
         {
             //Arrange
             var dbContext = _webHost.Services.CreateScope().ServiceProvider.GetService<ApplicationDbContext>();
@@ -159,14 +157,13 @@ namespace App.Integration.Tests
 
             var request = new
             {
-                Url = "Student/",
+                Url = "Homework/",
                 Body = new
                 {
                     Id = 1,
                     Name = "Test",
-                    PhoneNumber = "89523459674",
-                    Email = "test@epam.com",
-                    DateBirth = "2021-07-02T23:18:38.047Z"
+                    DatePass = "2021-07-02T23:18:38.047Z",
+                    StudentId = 1
                 }
             };
 
@@ -178,7 +175,7 @@ namespace App.Integration.Tests
 
             //Assert
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.AreEqual(dbContext.Students.Find(1).Name, "Test");
+            Assert.AreEqual(dbContext.Homeworks.Find(1).Name, "Test");
         }
 
         [Test]
@@ -189,14 +186,13 @@ namespace App.Integration.Tests
 
             var request = new
             {
-                Url = "Student/",
+                Url = "Homework/",
                 Body = new
                 {
                     Id = 1,
-                    Name = "Test",
-                    PhoneNumber = 89523459674,
-                    Email = "test@epam.com",
-                    DateBirth = 111
+                    Name = 2,
+                    DatePass = "2021-07-02T23:18:38.047Z",
+                    StudentId = 1
                 }
             };
 
@@ -211,18 +207,18 @@ namespace App.Integration.Tests
         }
 
         [Test]
-        public async Task Delete_StudentId_Ok()
+        public async Task Delete_HomeworkId_Ok()
         {
             //Arrange
             var dbContext = _webHost.Services.CreateScope().ServiceProvider.GetService<ApplicationDbContext>();
             var httpClient = _webHost.CreateClient();
 
             //Act
-            var response = await httpClient.DeleteAsync("Student/1");
+            var response = await httpClient.DeleteAsync("Homework/1");
 
             //Assert
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.AreEqual(dbContext.Students.Find(1), null);
+            Assert.AreEqual(dbContext.Homeworks.Find(1), null);
         }
 
         [Test]
@@ -232,7 +228,7 @@ namespace App.Integration.Tests
             var httpClient = _webHost.CreateClient();
 
             //Act
-            var response = await httpClient.DeleteAsync("Student/0");
+            var response = await httpClient.DeleteAsync("Homework/0");
 
             //Assert
             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);

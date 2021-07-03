@@ -7,7 +7,7 @@ namespace App.Infrastructure.Business
     {
         public void Send(string receiver)
         {
-            throw new NotImplementedException();
+            return;
         }
     }
 }
