@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace App.Integration.Tests
 {
     [TestFixture]
-    public class StudentsLectureControllerTest
+    public class HomeworkServiceControllerTest
     {
         private WebApplicationFactory<Startup> _webHost;
 
@@ -25,19 +25,37 @@ namespace App.Integration.Tests
         }
 
         [Test]
-        public async Task AddStudentsOnLecture_StudentLectureAppPost_Created()
+        public async Task CheckStudentHomeworkExistence_StudentIdLectureId_Ok()
         {
             //Arrange
-            var dbContext = _webHost.Services.CreateScope().ServiceProvider.GetService<ApplicationDbContext>();
+            var httpClient = _webHost.CreateClient();
+
+            //Act
+            var response = await httpClient.GetAsync("HomeworkService/CheckStudentHomeworkExistence/1/2");
+
+            //Assert
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+            var stringResponse = await response.Content.ReadAsStringAsync();
+            var resultResponse = JsonConvert.DeserializeObject<bool>(stringResponse);
+
+            Assert.AreEqual(true, resultResponse);
+        }
+
+        [Test]
+        public async Task SetHomeworkMark_HomeworkServiceAppPost_NoContent()
+        {
+            //Arrange
             var httpClient = _webHost.CreateClient();
 
             var request = new
             {
-                Url = "StudentsLecture/AddStudentsOnLecture",
+                Url = "HomeworkService/SetHomeworkMark",
                 Body = new
                 {
                     LectureId = 2,
-                    StudentsId = new int[] { 3 }
+                    StudentId = 1,
+                    Mark=4
                 }
             };
 
@@ -48,13 +66,7 @@ namespace App.Integration.Tests
             var response = await httpClient.PostAsync(request.Url, content);
 
             //Assert
-            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
-
-            var stringResponse = await response.Content.ReadAsStringAsync();
-            var resultResponse = JsonConvert.DeserializeObject<StudentsLectureOutput>(stringResponse);
-
-            Assert.That(resultResponse, Is.TypeOf<StudentsLectureOutput>());
-            Assert.AreEqual(dbContext.LecturesStudents.Find(1, 3).StudentId, resultResponse.Students.Last().StudentId);
+            Assert.AreEqual(HttpStatusCode.NoContent, response.StatusCode);
         }
     }
 }

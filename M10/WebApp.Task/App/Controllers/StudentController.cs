@@ -29,9 +29,7 @@ namespace App.Controllers
         public ActionResult<IEnumerable<StudentApp>> Get()
         {
             var studentsList = _mapper.Map<IEnumerable<Student>,List<StudentApp>>(_repo.Get());
-            if (!studentsList.Any())
-                return NotFound();
-
+        
             return Ok(studentsList);
         }
 
@@ -39,8 +37,6 @@ namespace App.Controllers
         public ActionResult<StudentApp> Get(int id)
         {
             var student = _mapper.Map<StudentApp>( _repo.GetById(id));
-            if (student == null)
-                return NotFound();
 
             return Ok(student);
         }
@@ -49,8 +45,6 @@ namespace App.Controllers
         public ActionResult<Student> Post(StudentAppPost student)
         {
             var createdStudent = _repo.Create(_mapper.Map<Student>(student));
-            if (createdStudent == null)
-                return BadRequest();
 
             return Created(nameof(Post), createdStudent);
         }
@@ -59,21 +53,16 @@ namespace App.Controllers
         public IActionResult Put(StudentApp studentInput)
         {
             var student = _mapper.Map<Student>(studentInput);
-
-            if (_repo.GetById(student.Id) == null)
-                return NotFound();
-
             _repo.Update(student);
+
             return Ok();
         }
 
         [HttpDelete("{id:int}")]
         public IActionResult Delete(int id)
         {
-            if (_repo.GetById(id) == null)
-                return NotFound();
-
             _repo.Remove(id);
+
             return Ok();
         }
     }

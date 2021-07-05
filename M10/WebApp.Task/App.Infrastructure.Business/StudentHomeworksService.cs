@@ -1,4 +1,5 @@
-﻿using App.Domain.core.Models;
+﻿using System.Collections.Generic;
+using App.Domain.core.Models;
 using App.Domain.Interfaces;
 using App.Services.Interfaces;
 using System.Linq;
@@ -18,13 +19,24 @@ namespace App.Infrastructure.Business
             _studentService = studentService;
         }
 
-        public bool CheckStudentHomework(int studentId, int lectureId)
+        public bool CheckHomeworkExistence(int studentId, int lectureId)
         {
             var homework = GetStudentHomework(studentId, lectureId);
 
-            if (homework == null)
+            return homework != null && homework.Mark != 0;
+        }
+
+        public Homework GetStudentHomework(int studentId, int lectureId)
+        {
+            var lecture = _repoLecture.GetById(lectureId);
+            IEnumerable<Homework> homework;
+
+            try
             {
-                var lecture = _repoLecture.GetById(lectureId);
+                homework = _repoHomework.Get(h => h.StudentId == studentId && h.Name == lecture.Name);
+            }
+            catch (KeyNotFoundException)
+            {
                 _repoHomework.Create(new Homework()
                 {
                     StudentId = studentId,
@@ -32,28 +44,15 @@ namespace App.Infrastructure.Business
                     DatePass = lecture.DateEvent,
                     Mark = 0
                 });
-
-                return false;
-            }
-
-            return true;
-        }
-
-        public Homework GetStudentHomework(int studentId, int lectureId)
-        {
-            var lecture = _repoLecture.GetById(lectureId);
-            var homework = _repoHomework.Get()
-                .Where(h => h.StudentId == studentId && h.Name == lecture.Name);
-
-            if (!homework.Any())
                 return null;
+            }
 
             return homework.First();
         }
 
         public void SetHomeworkMark(int studentId, int lectureId, int mark)
         {
-            var isHomeworkExist = CheckStudentHomework(studentId, lectureId);
+            var isHomeworkExist = CheckHomeworkExistence(studentId, lectureId);
 
             if (isHomeworkExist)
             {

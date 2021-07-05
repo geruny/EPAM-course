@@ -9,7 +9,7 @@ namespace App.Domain.Interfaces
 {
     public interface ILecturesStudentsRepository
     {
-        public IEnumerable<LecturesStudents> Get();
+        public IEnumerable<LecturesStudents> Get(Func<LecturesStudents, bool> predicate = null);
         public LecturesStudents Create(LecturesStudents item);
     }
 }

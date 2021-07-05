@@ -8,6 +8,6 @@ namespace App.Services.Interfaces
     public interface IStudentsLectureService
     {
         public StudentsLectureOutput GetStudents(int lectureId);
-        public StudentsLectureOutput AddStudents(int lecture, List<int> studentsId);
+        public StudentsLectureOutput AddStudents(int lectureId, List<int> studentsId);
     }
 }

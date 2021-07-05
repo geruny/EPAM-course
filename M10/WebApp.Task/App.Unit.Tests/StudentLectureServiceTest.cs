@@ -8,6 +8,7 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using App.Services.Models.StudentLectureServiceModels;
 using Range = Moq.Range;
 
@@ -82,7 +83,8 @@ namespace App.Unit.Tests
             _mockStudentHomeworkService = _mockRepo.Create<IStudentHomeworksService>();
             _mockStudentService = _mockRepo.Create<IStudentService>();
 
-            _mockLecturesStudentsRepo.Setup(repo => repo.Get()).Returns(_lecturesStudents);
+            _mockLecturesStudentsRepo.Setup(repo => repo.Get(It.IsAny<Func<LecturesStudents,bool>>()))
+                .Returns(_lecturesStudents.Where(l => l.LectureId == _lectureId));
             _mockLectureRepo.Setup(repo => repo.GetById(_lectureId)).Returns(_lectures[0]);
             _mockStudentRepo.Setup(repo => repo.GetById(It.Is<int>(id=>id>=0))).Returns(_students[0]);
         }
@@ -91,6 +93,8 @@ namespace App.Unit.Tests
         public void GetStudents_LectureId_StudentsLectureOutput()
         {
             //Arrange
+            const int expectedCount = 3;
+
             _service = new StudentsLectureService(_mockLecturesStudentsRepo.Object, _mockLectureRepo.Object,
                 _mockStudentRepo.Object, _mockStudentHomeworkService.Object,_mockStudentService.Object);
 
@@ -102,19 +106,20 @@ namespace App.Unit.Tests
             Assert.That(result.Students, Is.TypeOf<List<StudentsLectureSubmodel>>());
             Assert.AreEqual(_lectureId, result.LectureId);
             Assert.AreEqual(_lectureName, result.LectureName);
-            Assert.That(result.Students.Count == 3);
+            Assert.AreEqual(expectedCount,result.Students.Count);
         }
 
         [Test]
         public void AddStudents_LectureIdStudentsId_StudentsLectureOutput()
         {
             //Arrange
+            const int expectedCount = 3;
             var callBackCreatedLecturesStudents = new List<LecturesStudents>();
 
             _mockLecturesStudentsRepo.Setup(repo =>
                     repo.Create(It.Is<LecturesStudents>(ls => ls.LectureId == _lectureId && ls.StudentId >= 1)))
                 .Callback<LecturesStudents>(ls => callBackCreatedLecturesStudents.Add(ls));
-            _mockStudentRepo.Setup(repo => repo.Get()).Returns(_students);
+            _mockStudentRepo.Setup(repo => repo.Get(It.IsAny<Func<Student, bool>>())).Returns(_students);
             _mockStudentHomeworkService.Setup(repo =>
                 repo.SetHomeworkMark(It.IsAny<int>(), _lectureId, It.IsInRange(1, 5, Range.Inclusive)));
             _mockStudentService.Setup(service => service.CheckStudentTurnout(It.Is<int>(id => id >= 0)));
@@ -127,7 +132,7 @@ namespace App.Unit.Tests
 
             //Assert
             Assert.That(result, Is.TypeOf<StudentsLectureOutput>());
-            Assert.AreEqual(3,callBackCreatedLecturesStudents.Count);
+            Assert.AreEqual(expectedCount,callBackCreatedLecturesStudents.Count);
         }
     }
 }

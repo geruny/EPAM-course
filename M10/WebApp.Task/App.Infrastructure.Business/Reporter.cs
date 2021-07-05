@@ -29,13 +29,13 @@ namespace App.Infrastructure.Business
 
         public StudentReportOutput GenerateStudentAttendanceReport(string studentName)
         {
-            var studentEnumerable = _repoStudent.Get().Where(s => s.Name == studentName);
+            var studentEnumerable = _repoStudent.Get(s => s.Name == studentName);
 
             if (studentEnumerable.Count() > 1)
             {
                 var ex = new ArgumentException("There are two students with same name in DB");
                 _logger.LogError(ex,"Error in reporter");
-                return null;
+                throw ex;
             }
 
             var student = studentEnumerable.First();
@@ -70,14 +70,7 @@ namespace App.Infrastructure.Business
 
         public StudentsLectureOutput GenerateLectureAttendanceReport(string lectureName)
         {
-            var lectureId = _repoLecture.Get().Where(l => l.Name == lectureName).Select(l=>l.Id);
-            if (!lectureId.Any())
-            {
-                var ex = new ArgumentException("Lecture is not found");
-                _logger.LogError(ex,"Error in reporter");
-                return null;
-            }
-
+            var lectureId = _repoLecture.Get(l => l.Name == lectureName).Select(l=>l.Id);
             var report = _studentsLectureService.GetStudents(lectureId.First());
 
             return report;

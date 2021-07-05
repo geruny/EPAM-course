@@ -29,8 +29,7 @@ namespace App.Infrastructure.Business
 
         public StudentsLectureOutput GetStudents(int lectureId)
         {
-            var studentsId = _repoStudentsLecture.Get()
-                .Where(l => l.LectureId == lectureId)
+            var studentsId = _repoStudentsLecture.Get(l => l.LectureId == lectureId)
                 .Select(s => s.StudentId);
 
             var listOutputStudents = studentsId.Select(studentId =>
@@ -73,7 +72,7 @@ namespace App.Infrastructure.Business
                     StudentId = studentId
                 });
 
-                _studentHomeworksService.SetHomeworkMark(studentId, lectureId, new Random().Next(1, 5));
+                _studentHomeworksService.CheckHomeworkExistence(studentId, lectureId);
             }
 
             return GetStudents(lectureId);

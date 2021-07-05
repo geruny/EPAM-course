@@ -29,8 +29,6 @@ namespace App.Controllers
         public ActionResult<IEnumerable<LectureApp>> Get()
         {
             var lecturesList =_mapper.Map<IEnumerable<Lecture>,List<LectureApp>>( _repo.Get());
-            if (!lecturesList.Any())
-                return NotFound();
 
             return Ok(lecturesList);
         }
@@ -39,8 +37,6 @@ namespace App.Controllers
         public ActionResult<LectureApp> Get(int id)
         {
             var lecture =_mapper.Map<LectureApp>(_repo.GetById(id));
-            if (lecture == null)
-                return NotFound();
 
             return Ok(lecture);
         }
@@ -50,9 +46,6 @@ namespace App.Controllers
         {
             var createdLecture = _repo.Create(_mapper.Map<Lecture>(lecture));
 
-            if (createdLecture == null)
-                return BadRequest();
-
             return Created(nameof(Post), createdLecture);
         }
 
@@ -60,21 +53,16 @@ namespace App.Controllers
         public IActionResult Put(LectureApp lectureInput)
         {
             var lecture = _mapper.Map<Lecture>(lectureInput);
-
-            if (_repo.GetById(lecture.Id) == null)
-                return NotFound();
-
             _repo.Update(lecture);
+
             return Ok();
         }
 
         [HttpDelete("{id:int}")]
         public IActionResult Delete(int id)
         {
-            if (_repo.GetById(id) == null)
-                return NotFound();
-
             _repo.Remove(id);
+
             return Ok();
         }
     }

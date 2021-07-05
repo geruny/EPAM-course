@@ -4,7 +4,7 @@ namespace App.Services.Interfaces
 {
     public interface IStudentHomeworksService
     {
-        public bool CheckStudentHomework(int studentId, int lectureId);
+        public bool CheckHomeworkExistence(int studentId, int lectureId);
         public Homework GetStudentHomework(int studentId, int lectureId);
         public void SetHomeworkMark(int studentId, int lectureId,int mark);
     }

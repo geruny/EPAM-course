@@ -29,8 +29,6 @@ namespace App.Controllers
         public ActionResult<IEnumerable<HomeworkApp>> Get()
         {
             var homeworksList = _mapper.Map<IEnumerable<Homework>, List<HomeworkApp>>(_repo.Get());
-            if (!homeworksList.Any())
-                return NotFound();
 
             return Ok(homeworksList);
         }
@@ -39,8 +37,6 @@ namespace App.Controllers
         public ActionResult<HomeworkApp> Get(int id)
         {
             var homework = _mapper.Map<HomeworkApp>(_repo.GetById(id));
-            if (homework == null)
-                return NotFound();
 
             return Ok(homework);
         }
@@ -49,8 +45,6 @@ namespace App.Controllers
         public ActionResult<Homework> Post(HomeworkAppPost homework)
         {
             var createdHomework = _repo.Create(_mapper.Map<Homework>(homework));
-            if (createdHomework == null)
-                return BadRequest();
 
             return Created(nameof(Post), createdHomework);
         }
@@ -59,21 +53,16 @@ namespace App.Controllers
         public IActionResult Put(HomeworkApp homeworkInput)
         {
             var homework = _mapper.Map<Homework>(homeworkInput);
-
-            if (_repo.GetById(homework.Id) == null)
-                return NotFound();
-
             _repo.Update(homework);
+
             return Ok();
         }
 
         [HttpDelete("{id:int}")]
         public IActionResult Delete(int id)
         {
-            if (_repo.GetById(id) == null)
-                return NotFound();
-
             _repo.Remove(id);
+
             return Ok();
         }
     }

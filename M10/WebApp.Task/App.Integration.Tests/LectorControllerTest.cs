@@ -23,18 +23,7 @@ namespace App.Integration.Tests
         [SetUp]
         public void SetUp()
         {
-            _webHost = new WebApplicationFactory<Startup>().WithWebHostBuilder(builder =>
-                     builder.ConfigureServices(services =>
-                         {
-                             var dbContextDescriptor = services.SingleOrDefault(d =>
-                                 d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
-
-                             services.Remove(dbContextDescriptor);
-
-                             services.AddDbContext<ApplicationDbContext>(options =>
-                                 options.UseInMemoryDatabase("db"));
-                         }
-                     ));
+            _webHost = TestsConfigurationSetUp.WebConfigSetUp();
         }
 
         [Test]

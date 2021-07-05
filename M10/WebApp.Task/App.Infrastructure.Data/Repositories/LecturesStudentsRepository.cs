@@ -18,16 +18,22 @@ namespace App.Infrastructure.Data.Repositories
             _logger = logger;
         }
 
-        public IEnumerable<LecturesStudents> Get()
+        public IEnumerable<LecturesStudents> Get(Func<LecturesStudents, bool> predicate = null)
         {
-            var itemList = _context.LecturesStudents.ToList();
+            IEnumerable<LecturesStudents> itemList;
+            if (predicate != null)
+                itemList = _context.LecturesStudents.Where(predicate);
+            else
+                itemList = _context.LecturesStudents;
+
             if (!itemList.Any())
             {
-                var ex = new NullReferenceException($"Items {typeof(LecturesStudents)} in DB not found");
+                var ex = new KeyNotFoundException($"Items {nameof(LecturesStudents)} in DB not found");
                 _logger.LogError(ex, "Error in LecturesStudents repository");
+                throw ex;
             }
 
-            return itemList;
+            return itemList.ToList();
         }
 
         public LecturesStudents Create(LecturesStudents item)
@@ -39,8 +45,9 @@ namespace App.Infrastructure.Data.Repositories
 
             if (createdItem == null)
             {
-                var ex = new NullReferenceException($"Item {typeof(LecturesStudents)} in DB was not created");
+                var ex = new NullReferenceException($"Item {nameof(LecturesStudents)} in DB was not created");
                 _logger.LogError(ex, "Error in LecturesStudents repository");
+                throw ex;
             }
 
             return createdItem;

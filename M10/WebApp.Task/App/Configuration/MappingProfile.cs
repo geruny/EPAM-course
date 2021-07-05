@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using App.AppModels;
+﻿using App.AppModels;
 using App.AppPostModels;
 using App.Domain.core.Models;
 using AutoMapper;
 
-namespace App
+namespace App.Configuration
 {
     public class MappingProfile : Profile
     {

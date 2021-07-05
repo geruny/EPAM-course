@@ -23,8 +23,6 @@ namespace App.Controllers
         public ActionResult<StudentReportOutput> GetStudentAttendance(string studentName)
         {
             var report = _reporter.GenerateStudentAttendanceReport(studentName);
-            if (report==null)
-                return BadRequest();
 
             return Ok(report);
         }
@@ -33,8 +31,6 @@ namespace App.Controllers
         public ActionResult<StudentsLectureOutput> GetLectureAttendance(string lectureName)
         {
             var report = _reporter.GenerateLectureAttendanceReport(lectureName);
-            if (report==null)
-                return BadRequest();
 
             return report;
         }

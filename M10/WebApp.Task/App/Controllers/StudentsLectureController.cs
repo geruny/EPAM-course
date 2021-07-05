@@ -20,23 +20,10 @@ namespace App.Controllers
             _service = service;
         }
 
-        [HttpGet("{id:int}")]
-        public ActionResult<StudentsLectureOutput> GetStudents(int id)
-        {
-            var result = _service.GetStudents(id);
-            if (result == null)
-                return NotFound();
-
-            return Ok(result);
-        }
-
-        [HttpPost]
+        [HttpPost( "AddStudentsOnLecture")]
         public ActionResult<StudentsLectureOutput> AddStudentsOnLecture(StudentsLectureAppPost studentsLecture)
         {
             var created = _service.AddStudents(studentsLecture.LectureId, studentsLecture.StudentsId);
-
-            if (created == null)
-                return BadRequest();
 
             return Created(nameof(AddStudentsOnLecture), created);
         }

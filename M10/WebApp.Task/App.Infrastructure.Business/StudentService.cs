@@ -1,8 +1,11 @@
 ﻿using System;
+using System.ComponentModel.Design;
 using System.Linq;
 using App.Domain.core.Models;
 using App.Domain.Interfaces;
+using App.Infrastructure.Business.Options;
 using App.Services.Interfaces;
+using Microsoft.Extensions.Options;
 using static App.Infrastructure.Business.ServiceFactory;
 
 namespace App.Infrastructure.Business
@@ -16,8 +19,9 @@ namespace App.Infrastructure.Business
         private readonly IGenericBaseRepository<Homework> _repoHomework;
         private readonly ISender _mailSender;
         private readonly ISender _messageSender;
+        private readonly StudentServiceOptions _options;
 
-        public StudentService(ILecturesStudentsRepository repoStudentsLecture, IGenericBaseRepository<Lecture> repoLecture, IGenericBaseRepository<Student> repoStudent, IGenericBaseRepository<Lector> repoLector, IGenericBaseRepository<Homework> repoHomework, ServiceResolver serviceResolver)
+        public StudentService(ILecturesStudentsRepository repoStudentsLecture, IGenericBaseRepository<Lecture> repoLecture, IGenericBaseRepository<Student> repoStudent, IGenericBaseRepository<Lector> repoLector, IGenericBaseRepository<Homework> repoHomework, ServiceResolver serviceResolver, IOptions<StudentServiceOptions>  options)
         {
             _repoStudentsLecture = repoStudentsLecture;
             _repoLecture = repoLecture;
@@ -27,17 +31,18 @@ namespace App.Infrastructure.Business
 
             _mailSender = serviceResolver(ServiceType.MailSender);
             _messageSender = serviceResolver(ServiceType.MessageSender);
+
+            _options = options.Value;
         }
 
         public void CheckStudentTurnout(int studentId)
         {
-            var countStudentLectures = _repoStudentsLecture.Get()
-                .Where(sl => sl.StudentId == studentId)
+            var countStudentLectures = _repoStudentsLecture.Get(sl => sl.StudentId == studentId)
                 .Select(ls => ls.LectureId).Count();
             var countAllLectures = _repoLecture.Get().Count();
 
             var difference = countAllLectures - countStudentLectures;
-            if (difference <= 3) return;
+            if (difference <= _options.AllowedNumberOfPassesLectures) return;
 
             var lectorId = _repoLecture.Get().Last().LectorId;
             var lectorEmail = _repoLector.GetById(lectorId).Email;
@@ -49,12 +54,11 @@ namespace App.Infrastructure.Business
 
         public void CheckStudentAverageScore(int studentId)
         {
-            var studentHomeworkMarks = _repoHomework.Get()
-                .Where(h => h.StudentId == studentId)
+            var studentHomeworkMarks = _repoHomework.Get(h => h.StudentId == studentId)
                 .Select(h => h.Mark);
 
             var studentAverageScore = studentHomeworkMarks.Sum() / studentHomeworkMarks.Count();
-            if (studentAverageScore >= 4) return;
+            if (studentAverageScore >= _options.AllowedAverageScoreHomework) return;
 
             var studentPhoneNumber = _repoStudent.GetById(studentId).PhoneNumber;
             _messageSender.Send(studentPhoneNumber);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using App.Domain.core;
 using App.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -18,16 +19,22 @@ namespace App.Infrastructure.Data.Repositories
             _logger = logger;
         }
 
-        public IEnumerable<TEntity> Get()
+        public IEnumerable<TEntity> Get(Func<TEntity, bool> predicate = null)
         {
-            var itemList = _context.Set<TEntity>().ToList();
+            IEnumerable<TEntity> itemList;
+            if (predicate != null)
+                itemList = _context.Set<TEntity>().Where(predicate);
+            else
+                itemList = _context.Set<TEntity>();
+
             if (!itemList.Any())
             {
-                var ex = new NullReferenceException($"Items {typeof(TEntity)} in DB not found");
+                var ex = new KeyNotFoundException($"Items {typeof(TEntity).Name} in DB not found");
                 _logger.LogError(ex, "Error in Base repository");
+                throw ex;
             }
 
-            return itemList;
+            return itemList.ToList();
         }
 
         public TEntity GetById(int id)
@@ -36,8 +43,9 @@ namespace App.Infrastructure.Data.Repositories
 
             if (item == null)
             {
-                var ex = new NullReferenceException($"Item {typeof(TEntity)} in DB not found");
+                var ex = new KeyNotFoundException($"Item {typeof(TEntity).Name} in DB not found");
                 _logger.LogError(ex, "Error in Base repository");
+                throw ex;
             }
 
             return item;
@@ -48,12 +56,13 @@ namespace App.Infrastructure.Data.Repositories
             _context.Set<TEntity>().Add(item);
             _context.SaveChanges();
 
-            var createdItem = GetById(item.Id);
+            var createdItem = _context.Set<TEntity>().Find(item.Id);
 
             if (createdItem == null)
             {
-                var ex= new NullReferenceException($"Item {typeof(TEntity)} in DB was not created");
+                var ex = new NullReferenceException($"Item {typeof(TEntity).Name} in DB was not created");
                 _logger.LogError(ex, "Error in Base repository");
+                throw ex;
             }
 
             return createdItem;
@@ -61,7 +70,14 @@ namespace App.Infrastructure.Data.Repositories
 
         public void Update(TEntity item)
         {
-            var itemToUpdate = GetById(item.Id);
+            var itemToUpdate = _context.Set<TEntity>().Find(item.Id);
+
+            if (itemToUpdate == null)
+            {
+                var ex = new KeyNotFoundException($"Item {typeof(TEntity).Name} in DB not found");
+                _logger.LogError(ex, "Error in Base repository");
+                throw ex;
+            }
 
             _context.Entry(itemToUpdate).CurrentValues.SetValues(item);
             _context.SaveChanges();
@@ -69,7 +85,14 @@ namespace App.Infrastructure.Data.Repositories
 
         public void Remove(int id)
         {
-            var itemToRemove = GetById(id);
+            var itemToRemove = _context.Set<TEntity>().Find(id);
+
+            if (itemToRemove == null)
+            {
+                var ex = new KeyNotFoundException($"Item {typeof(TEntity).Name} in DB not found");
+                _logger.LogError(ex, "Error in Base repository");
+                throw ex;
+            }
 
             _context.Set<TEntity>().Remove(itemToRemove);
             _context.SaveChanges();

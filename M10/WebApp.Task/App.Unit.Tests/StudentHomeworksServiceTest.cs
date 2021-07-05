@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using App.Domain.core.Models;
+﻿using App.Domain.core.Models;
 using App.Domain.Interfaces;
 using App.Infrastructure.Business;
 using App.Services.Interfaces;
 using Moq;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace App.Unit.Tests
 {
@@ -17,9 +15,9 @@ namespace App.Unit.Tests
     {
         private readonly List<Homework> _homeworks = new()
         {
-            new Homework { Id = 1, StudentId = 1, Name = "Module 1", DatePass = new DateTime(2021, 01, 12) },
-            new Homework { Id = 2, StudentId = 1, Name = "Module 2", DatePass = new DateTime(2021, 01, 19) },
-            new Homework { Id = 3, StudentId = 2, Name = "Module 1", DatePass = new DateTime(2021, 01, 14) },
+            new Homework { Id = 1, StudentId = 1, Name = "Module 1", DatePass = new DateTime(2021, 01, 12), Mark = 4 },
+            new Homework { Id = 2, StudentId = 1, Name = "Module 2", DatePass = new DateTime(2021, 01, 19), Mark = 5 },
+            new Homework { Id = 3, StudentId = 2, Name = "Module 1", DatePass = new DateTime(2021, 01, 14), Mark = 3 },
         };
 
         private readonly List<Lecture> _lectures = new()
@@ -51,56 +49,38 @@ namespace App.Unit.Tests
         [SetUp]
         public void SetUp()
         {
-            _mockHomeworkRepo.Setup(repo => repo.Get()).Returns(_homeworks);
+            _mockHomeworkRepo.Setup(repo => repo.Get(It.IsAny<Func<Homework, bool>>()))
+                .Returns(_homeworks.Where(h => h.StudentId == studentId && h.Name == _lectures[0].Name));
             _mockHomeworkRepo.Setup(repo => repo.Create(It.IsAny<Homework>()));
         }
 
         [Test]
-        public void CheckStudentHomework_StudentIdLectureIdWithHomework_True()
+        public void CheckHomeworkExistence_StudentIdLectureIdWithHomework_True()
         {
             //Arrange
-            _service = new StudentHomeworksService(_mockHomeworkRepo.Object, _mockLectureRepo.Object,_mockStudentService.Object);
+            _service = new StudentHomeworksService(_mockHomeworkRepo.Object, _mockLectureRepo.Object, _mockStudentService.Object);
 
             //Act
-            var result = _service.CheckStudentHomework(studentId, lectureId);
+            var result = _service.CheckHomeworkExistence(studentId, lectureId);
 
             //Assert
             Assert.AreEqual(true, result);
         }
 
         [Test]
-        public void CheckStudentHomework_StudentIdLectureIdWithoutHomework_False()
+        public void CheckHomeworkExistence_StudentIdLectureIdWithoutHomework_False()
         {
             //Arrange
-            Homework callBackCreatedHomework = null;
-            List<Homework> homeworks = new()
-            {
-                new Homework { Id = 5, StudentId = 3, Name = "Module 1", DatePass = new DateTime(2021, 01, 11) },
-                new Homework { Id = 6, StudentId = 3, Name = "Module 2", DatePass = new DateTime(2021, 02, 08) }
-            };
-            var expected = new Homework()
-            {
-                StudentId = studentId,
-                Name = _lectures[lectureId - 1].Name,
-                DatePass = _lectures[lectureId - 1].DateEvent,
-                Mark = 0
-            };
+            _mockHomeworkRepo.Setup(repo => repo.Get(It.IsAny<Func<Homework, bool>>()))
+                .Throws<KeyNotFoundException>();
 
-            _mockHomeworkRepo.Setup(repo => repo.Create(It.IsAny<Homework>()))
-                .Callback<Homework>(h => callBackCreatedHomework = h); ;
-            _mockHomeworkRepo.Setup(repo => repo.Get()).Returns(homeworks);
-
-            _service = new StudentHomeworksService(_mockHomeworkRepo.Object, _mockLectureRepo.Object,_mockStudentService.Object);
+            _service = new StudentHomeworksService(_mockHomeworkRepo.Object, _mockLectureRepo.Object, _mockStudentService.Object);
 
             //Act
-            var result = _service.CheckStudentHomework(studentId, lectureId);
+            var result = _service.CheckHomeworkExistence(studentId, lectureId);
 
             //Assert
             Assert.AreEqual(false, result);
-            Assert.AreEqual(expected.StudentId, callBackCreatedHomework.StudentId);
-            Assert.AreEqual(expected.Name, callBackCreatedHomework.Name);
-            Assert.AreEqual(expected.DatePass, callBackCreatedHomework.DatePass);
-            Assert.AreEqual(expected.Mark, callBackCreatedHomework.Mark);
         }
 
         [Test]
@@ -109,7 +89,7 @@ namespace App.Unit.Tests
             //Arrange
             var expected = _homeworks[0];
 
-            _service = new StudentHomeworksService(_mockHomeworkRepo.Object, _mockLectureRepo.Object,_mockStudentService.Object);
+            _service = new StudentHomeworksService(_mockHomeworkRepo.Object, _mockLectureRepo.Object, _mockStudentService.Object);
 
             //Act
             var result = _service.GetStudentHomework(studentId, lectureId);
@@ -119,34 +99,35 @@ namespace App.Unit.Tests
         }
 
         [Test]
-        public void GetStudentHomework_StudentIdLectureIdWithoutHomework_Homework()
+        public void GetStudentHomework_StudentIdLectureIdWithoutHomework_Null()
         {
             //Arrange
-            List<Homework> homeworks = new()
-            {
-                new Homework { Id = 5, StudentId = 3, Name = "Module 1", DatePass = new DateTime(2021, 01, 11) },
-                new Homework { Id = 6, StudentId = 3, Name = "Module 2", DatePass = new DateTime(2021, 02, 08) }
-            };
+            const int expectedMark = 0;
+            Homework callBackCreatedHomework = null;
 
-            _mockHomeworkRepo.Setup(repo => repo.Get()).Returns(homeworks);
+            _mockHomeworkRepo.Setup(repo => repo.Create(It.IsAny<Homework>()))
+                .Callback<Homework>(h => callBackCreatedHomework = h);
+            _mockHomeworkRepo.Setup(repo => repo.Get(It.IsAny<Func<Homework, bool>>()))
+                .Throws<KeyNotFoundException>();
 
-            _service = new StudentHomeworksService(_mockHomeworkRepo.Object, _mockLectureRepo.Object,_mockStudentService.Object);
+            _service = new StudentHomeworksService(_mockHomeworkRepo.Object, _mockLectureRepo.Object, _mockStudentService.Object);
 
             //Act
             var result = _service.GetStudentHomework(studentId, lectureId);
 
             //Assert
+            Assert.AreEqual(expectedMark, callBackCreatedHomework.Mark);
             Assert.AreEqual(null, result);
         }
 
         [Test]
-        public void SetHomeworkMark_StudentIdLectureIdMarkWithHomework_Void()
+        public void SetHomeworkMark_StudentIdLectureIdMarkWithHomework_CorrectMark()
         {
             //Arrange
             var mark = 5;
 
             _mockStudentService.Setup(service => service.CheckStudentAverageScore(studentId));
-            _service = new StudentHomeworksService(_mockHomeworkRepo.Object, _mockLectureRepo.Object,_mockStudentService.Object);
+            _service = new StudentHomeworksService(_mockHomeworkRepo.Object, _mockLectureRepo.Object, _mockStudentService.Object);
 
             //Act
             _service.SetHomeworkMark(studentId, lectureId, mark);
@@ -156,29 +137,26 @@ namespace App.Unit.Tests
         }
 
         [Test]
-        public void SetHomeworkMark_StudentIdLectureIdMarkWithoutHomework_Void()
+        public void SetHomeworkMark_StudentIdLectureIdMarkWithoutHomework_ZeroMark()
         {
             //Arrange
-            var mark = 5;
+            const int mark = 5;
+            const int expectedMark = 0;
             Homework callBackCreatedHomework = null;
-            List<Homework> homeworks = new()
-            {
-                new Homework { Id = 5, StudentId = 3, Name = "Module 1", DatePass = new DateTime(2021, 01, 11) },
-                new Homework { Id = 6, StudentId = 3, Name = "Module 2", DatePass = new DateTime(2021, 02, 08) }
-            };
 
             _mockHomeworkRepo.Setup(repo => repo.Create(It.IsAny<Homework>()))
                 .Callback<Homework>(h => callBackCreatedHomework = h);
-            _mockHomeworkRepo.Setup(repo => repo.Get()).Returns(homeworks);
+            _mockHomeworkRepo.Setup(repo => repo.Get(It.IsAny<Func<Homework, bool>>()))
+                .Throws<KeyNotFoundException>();
             _mockStudentService.Setup(service => service.CheckStudentAverageScore(studentId));
 
-            _service = new StudentHomeworksService(_mockHomeworkRepo.Object, _mockLectureRepo.Object,_mockStudentService.Object);
+            _service = new StudentHomeworksService(_mockHomeworkRepo.Object, _mockLectureRepo.Object, _mockStudentService.Object);
 
             //Act
             _service.SetHomeworkMark(studentId, lectureId, mark);
 
             //Assert
-            Assert.AreEqual(0, callBackCreatedHomework.Mark);
+            Assert.AreEqual(expectedMark, callBackCreatedHomework.Mark);
         }
     }
 }
